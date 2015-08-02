@@ -13,60 +13,92 @@
 </head>
 
 <body>
+  <ul id="tracks">
+    <li>
+      <button class="record">Record</button>
+      <button class="stopRecording" disabled>Stop Record</button>
+      <button class="play" disabled>Play</button>
+      <button class="pause" disabled>Pause</button>
+      <aside class="status">Waiting...</aside>
+    </li>
+    <li>
+      <button class="record">Record</button>
+      <button class="stopRecording" disabled>Stop Record</button>
+      <button class="play" disabled>Play</button>
+      <button class="pause" disabled>Pause</button>
+      <aside class="status">Waiting...</aside>
+    </li>
+  </ul>
   <script>
     (function() { 
-      var mic, recorder, soundFile;
-      var doNext, startUp, startRecording, stopRecording, playRecording, saveRecording;
+      var tracksList = $("[id=tracks]");
+     
+      var mic = new p5.AudioIn();
+      mic.start();
       
-      startUp = function() {
-        createCanvas(400,400);
-        background(200);
-        fill(0);
-        text('Enable mic and click the mouse to begin recording', 20, 20);
+      var disable = function(itemsToDisable) {
+        itemsToDisable.map(function(item){ 
+          item.prop('disabled', true);
+        });
+      }
+      var enable = function(itemsToEnable) {
+        itemsToEnable.map(function(item){ 
+          item.prop('disabled', false);
+        });
+      }
       
-        mic = new p5.AudioIn();
-        mic.start();
-        recorder = new p5.SoundRecorder();
+      var setupControls = function(container) {
+        var recordButton = $("[class=record]", container);
+        var stopRecordingButton = $("[class=stopRecording]", container);
+        var playButton = $("[class=play]", container);
+        var pauseButton = $("[class=pause]", container);
+        var statusText = $("[class=status]", container);
+        
+        var soundFile;
+        var recorder = new p5.SoundRecorder();
         recorder.setInput(mic);
         
-        doNext = startRecording;
-      }
+        recordButton.on('click', function() {
+          if(!mic.enabled) {
+            alert("You have to enable the microphone first!")
+          } else {
+            disable([recordButton, playButton, pauseButton]);
+            enable([stopRecordingButton]);
+            if(soundFile) {
+              soundFile.stop();
+              soundFile.disconnect();
+            }
+            soundFile = new p5.SoundFile();
+            recorder.record(soundFile);
+            statusText.text("Recording");
+          }
+        });
+        
+        stopRecordingButton.on('click', function() {
+          disable([stopRecordingButton, pauseButton]);
+          enable([recordButton, playButton]);
+          recorder.stop(); // sends the result to the soundFile
+          statusText.text("Recorded");
+        });
+        
+        playButton.on('click', function() {
+          disable([stopRecordingButton,, playButton]);
+          enable([recordButton, pauseButton]);
+          soundFile.loop();
+          statusText.text("Playing");
+        });
+        
+        pauseButton.on('click', function() {
+          disable([stopRecordingButton, pauseButton]);
+          enable([recordButton, playButton]);
+          soundFile.pause();
+          statusText.text("Paused");
+        });
+        
+      };
+      tracksList.find("li").toArray().forEach(setupControls)
       
-      startRecording = function() {
-        if(!mic.enabled) {
-          alert("You have to enable the microphone first!")
-          return;
-        }
-        soundFile = new p5.SoundFile();
-        recorder.record(soundFile);
-        background(255,0,0);
-        text('Recording now! Click to stop.', 20, 20);
-        
-        doNext = stopRecording
-      }
-      stopRecording = function() {
-        recorder.stop(); // sends the result to the soundFile
-        background(0,255,0);
-        text('Recording stopped. Click to play', 20, 20);
-        
-        doNext = playRecording
-      }
-      playRecording = function() {
-        soundFile.play();
-        
-        doNext = playRecording
-      }
-      saveRecording = function() {
-        saveSound(soundFile, 'mySound.wav');
-        
-        doNext = playRecording
-      }
-      
-      window.setup = startUp; //p5 doees not seem to initialize unless there's a global setup method
-      window._doNext = function() { doNext() }
-      window._getMic = function() { return mic };
-      window._getSoundFile = function() { return soundFile };
-      window._getRecorder = function() { return recorder   };
+      window.setup = function(){}; //p5 doees not seem to initialize unless there"s a global setup method
     })()
   </script>
 </body>
