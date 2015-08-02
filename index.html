@@ -12,13 +12,11 @@
       display: block;
     }
   </style>
-  <script language="javascript" src="bower_components/jquery/dist/jquery.js"></script>
-  <script language="javascript" src="p5/lib/p5.js"></script>
-  <script language="javascript" src="p5/lib/addons/p5.dom.js"></script>
-  <script language="javascript" src="p5/lib/addons/p5.sound.js"></script>
-  <script>
-      window.setup = function(){}; //p5 doees not seem to initialize unless there"s a global setup method
-  </script>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="p5/lib/p5.js"></script>
+  <script src="p5/lib/addons/p5.dom.js"></script>
+  <script src="p5/lib/addons/p5.sound.js"></script>
+  <script src="looper.js"></script>
 </head>
 
 <body>
@@ -46,10 +44,9 @@
   </template>
   
   <script>
-    (function() { 
+    $(function() { 
       "use strict"
       var tracksList = $("[id=tracks]");
-      var trackTemplate = $("[id=track-template]");
       var addTrackButton = $("[id=add-track]");
      
       var mic = new p5.AudioIn();
@@ -58,12 +55,12 @@
         itemsToDisable.map(function(item){ 
           item.prop("disabled", true);
         });
-      }
+      };
       var enable = function(itemsToEnable) {
         itemsToEnable.map(function(item){ 
           item.prop("disabled", false);
         });
-      }
+      };
       
       var setupControls = function(container) {
         var recordButton = $("[class=record]", container);
@@ -126,7 +123,7 @@
       };
  
       var addTrack = function() {
-        var container = document.importNode( trackTemplate.prop("content"), true); //get contents of template and clone them
+        var container = looper.createNewControlsHtml();
         setupControls(container);
         tracksList.append(container);
       }
@@ -134,6 +131,6 @@
       mic.start();
       addTrackButton.on("click", addTrack);
       addTrack();
-    })()
+    });
   </script>
 </body>
