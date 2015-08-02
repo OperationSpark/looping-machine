@@ -5,45 +5,62 @@
       padding: 0; 
       margin: 0;
     } 
+    input[type=range] {
+      width: 300px;
+    }
+    label {
+      display: block;
+    }
   </style>
   <script language="javascript" src="bower_components/jquery/dist/jquery.js"></script>
   <script language="javascript" src="p5/lib/p5.js"></script>
   <script language="javascript" src="p5/lib/addons/p5.dom.js"></script>
   <script language="javascript" src="p5/lib/addons/p5.sound.js"></script>
+  <script>
+      window.setup = function(){}; //p5 doees not seem to initialize unless there"s a global setup method
+  </script>
 </head>
 
 <body>
-  <ul id="tracks">
+  <ul id="tracks"> </ul>
+  <fieldset>
+    <button id="add-track">Add Track</button>
+  </fieldset>
+  
+  <template id="track-template">
     <li>
+      <aside class="status">Waiting...</aside>
       <button class="record">Record</button>
       <button class="stopRecording" disabled>Stop Record</button>
       <button class="play" disabled>Play</button>
       <button class="pause" disabled>Pause</button>
-      <aside class="status">Waiting...</aside>
+      <label>
+        Rate:
+        <input class="rate" type="range" min="0.1" max="3" step="0.1" value="1" disabled>
+      </label>
+      <label>
+        Volume:
+        <input class="volume" type="range" min="0.1" max="5" step="0.2" value="1" disabled>
+      </label>
     </li>
-    <li>
-      <button class="record">Record</button>
-      <button class="stopRecording" disabled>Stop Record</button>
-      <button class="play" disabled>Play</button>
-      <button class="pause" disabled>Pause</button>
-      <aside class="status">Waiting...</aside>
-    </li>
-  </ul>
+  </template>
+  
   <script>
     (function() { 
       var tracksList = $("[id=tracks]");
+      var trackTemplate = $("[id=track-template]");
+      var addTrackButton = $("[id=add-track]");
      
       var mic = new p5.AudioIn();
-      mic.start();
       
       var disable = function(itemsToDisable) {
         itemsToDisable.map(function(item){ 
-          item.prop('disabled', true);
+          item.prop("disabled", true);
         });
       }
       var enable = function(itemsToEnable) {
         itemsToEnable.map(function(item){ 
-          item.prop('disabled', false);
+          item.prop("disabled", false);
         });
       }
       
@@ -52,17 +69,19 @@
         var stopRecordingButton = $("[class=stopRecording]", container);
         var playButton = $("[class=play]", container);
         var pauseButton = $("[class=pause]", container);
+        var rateControl = $("[class=rate]", container);
+        var volumeControl = $("[class=volume]", container);
         var statusText = $("[class=status]", container);
         
         var soundFile;
         var recorder = new p5.SoundRecorder();
         recorder.setInput(mic);
         
-        recordButton.on('click', function() {
+        recordButton.on("click", function() {
           if(!mic.enabled) {
             alert("You have to enable the microphone first!")
           } else {
-            disable([recordButton, playButton, pauseButton]);
+            disable([recordButton, playButton, pauseButton, rateControl, volumeControl]);
             enable([stopRecordingButton]);
             if(soundFile) {
               soundFile.stop();
@@ -74,31 +93,46 @@
           }
         });
         
-        stopRecordingButton.on('click', function() {
+        stopRecordingButton.on("click", function() {
           disable([stopRecordingButton, pauseButton]);
-          enable([recordButton, playButton]);
+          enable([recordButton, playButton, rateControl, volumeControl]);
           recorder.stop(); // sends the result to the soundFile
           statusText.text("Recorded");
         });
         
-        playButton.on('click', function() {
+        playButton.on("click", function() {
           disable([stopRecordingButton,, playButton]);
-          enable([recordButton, pauseButton]);
+          enable([recordButton, pauseButton, rateControl, volumeControl]);
           soundFile.loop();
           statusText.text("Playing");
         });
         
-        pauseButton.on('click', function() {
+        pauseButton.on("click", function() {
           disable([stopRecordingButton, pauseButton]);
-          enable([recordButton, playButton]);
+          enable([recordButton, playButton, rateControl, volumeControl]);
           soundFile.pause();
           statusText.text("Paused");
         });
         
+        rateControl.on("change", function() {
+          soundFile.rate(rateControl.prop("value"));
+        });
+        
+        volumeControl.on("change", function() {
+          soundFile.setVolume(+volumeControl.prop("value"));
+        });
+        
       };
-      tracksList.find("li").toArray().forEach(setupControls)
+ 
+      var addTrack = function() {
+        var container = document.importNode( trackTemplate.prop("content"), true); //get contents of template and clone them
+        setupControls(container);
+        tracksList.append(container);
+      }
       
-      window.setup = function(){}; //p5 doees not seem to initialize unless there"s a global setup method
+      mic.start();
+      addTrackButton.on("click", addTrack);
+      addTrack();
     })()
   </script>
 </body>
