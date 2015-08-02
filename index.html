@@ -1,0 +1,72 @@
+
+<head>
+  <style> 
+    body {
+      padding: 0; 
+      margin: 0;
+    } 
+  </style>
+  <script language="javascript" src="bower_components/jquery/dist/jquery.js"></script>
+  <script language="javascript" src="p5/lib/p5.js"></script>
+  <script language="javascript" src="p5/lib/addons/p5.dom.js"></script>
+  <script language="javascript" src="p5/lib/addons/p5.sound.js"></script>
+</head>
+
+<body>
+  <script>
+    (function() { 
+      var mic, recorder, soundFile;
+      var doNext, startUp, startRecording, stopRecording, playRecording, saveRecording;
+      
+      startUp = function() {
+        createCanvas(400,400);
+        background(200);
+        fill(0);
+        text('Enable mic and click the mouse to begin recording', 20, 20);
+      
+        mic = new p5.AudioIn();
+        mic.start();
+        recorder = new p5.SoundRecorder();
+        recorder.setInput(mic);
+        
+        doNext = startRecording;
+      }
+      
+      startRecording = function() {
+        if(!mic.enabled) {
+          alert("You have to enable the microphone first!")
+          return;
+        }
+        soundFile = new p5.SoundFile();
+        recorder.record(soundFile);
+        background(255,0,0);
+        text('Recording now! Click to stop.', 20, 20);
+        
+        doNext = stopRecording
+      }
+      stopRecording = function() {
+        recorder.stop(); // sends the result to the soundFile
+        background(0,255,0);
+        text('Recording stopped. Click to play', 20, 20);
+        
+        doNext = playRecording
+      }
+      playRecording = function() {
+        soundFile.play();
+        
+        doNext = playRecording
+      }
+      saveRecording = function() {
+        saveSound(soundFile, 'mySound.wav');
+        
+        doNext = playRecording
+      }
+      
+      window.setup = startUp; //p5 doees not seem to initialize unless there's a global setup method
+      window._doNext = function() { doNext() }
+      window._getMic = function() { return mic };
+      window._getSoundFile = function() { return soundFile };
+      window._getRecorder = function() { return recorder   };
+    })()
+  </script>
+</body>
