@@ -1,0 +1,29 @@
+{
+  "name": "looping-machine",
+  "version": "1.0.0",
+  "description": "A simple tutorial demonstrating how to use p5 to put together a looping machine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/togakangaroo/looping-machine.git"
+  },
+  "keywords": [
+    "audio",
+    "sound-machine",
+    "looping",
+    "tutorial",
+    "lesson"
+  ],
+  "author": "gmauer@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/togakangaroo/looping-machine/issues"
+  },
+  "homepage": "https://github.com/togakangaroo/looping-machine#readme",
+  "dependencies": {
+    "express": "^4.12.4"
+  }
+}

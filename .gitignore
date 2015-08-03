@@ -1,1 +1,10 @@
-.c9/
+.c9
+*.DS_STORE
+.project
+**/node_modules/*
+experiments/*
+lib_old/*
+docs/reference/*
+docs/yuidoc-p5-theme/assets/js/reference.js*
+!*.gitkeep
+npm-debug.log
