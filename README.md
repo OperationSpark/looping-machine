@@ -1,6 +1,6 @@
 Welcome to the looping machine. In this project you will use libraries to create a looping machine in your browser. When done, you'll be able to record, play back, modify, and mix together beats in your browser!
 
-# 1: Figure out how to record and play audio
+# Figure out how to record and play audio
 
 We want to make sure that we know how to record and play back audio *before* we start messing with building an entire application around the concept. We are going to be using the [p5 library](http://p5js.org/) for this. This is simply another version of ProcessingJs (the same drawing stuff you use in Khan Academy) but with addons for working with sound.
 
@@ -16,7 +16,7 @@ See if you can also figure out the answer to
 * Do you have a theory on how you would pause a sound?
 * There are three things from p5 that are being used here - `mic` (the microphone), `recorder` (to actually do the recording), and `soundFile`. Can you guess which ones you would have to duplicate if you wanted to record and play back multiple tracks at the same time?
 
-# 2: Get the project and run the template
+# Get the project and run the template
 
 Pull down the project [from Github](https://github.com/OperationSpark/looping-machine).
 
@@ -28,3 +28,11 @@ If you are on your own computer you will need a webserver to run it. The applica
 
 * `npm install` to download everything that is required to run a server (this is a one-time thing)
 * `npm start` to start the server. You will run this whenever you want to start the application. Once it is running you can open your browser to http://localhost:8283.
+
+# Create a set of record/play controls when adding a track
+
+  var container = looper.createNewControlsHtml();
+  tracksList.append(container);
+
+# Record audio
+# Play audio
