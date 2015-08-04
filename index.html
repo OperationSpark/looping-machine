@@ -47,19 +47,6 @@
       var tracksList = $("[id=tracks]");
       var addTrackButton = $("[id=add-track]");
 
-      var mic = new p5.AudioIn();
-
-      var disable = function(itemsToDisable) {
-        itemsToDisable.map(function(item){
-          item.prop("disabled", true);
-        });
-      };
-      var enable = function(itemsToEnable) {
-        itemsToEnable.map(function(item){
-          item.prop("disabled", false);
-        });
-      };
-
       var setupControls = function(container) {
         var recordButton = $("[class=record]", container);
         var stopRecordingButton = $("[class=stopRecording]", container);
@@ -69,53 +56,42 @@
         var volumeControl = $("[class=volume]", container);
         var statusText = $("[class=status]", container);
 
-        var soundFile;
-        var recorder = new p5.SoundRecorder();
-        recorder.setInput(mic);
+        var controls = looper.getControlHelper();
 
         recordButton.on("click", function() {
-          if(!mic.enabled) {
-            alert("You have to enable the microphone first!")
-          } else {
-            disable([recordButton, playButton, pauseButton, rateControl, volumeControl]);
-            enable([stopRecordingButton]);
-            if(soundFile) {
-              soundFile.stop();
-              soundFile.disconnect();
-            }
-            soundFile = new p5.SoundFile();
-            recorder.record(soundFile);
-            statusText.text("Recording");
-          }
+          looper.disable(recordButton, playButton, pauseButton, rateControl, volumeControl);
+          looper.enable(stopRecordingButton);
+          controls.startRecording();
+          statusText.text("Recording");
         });
 
         stopRecordingButton.on("click", function() {
-          disable([stopRecordingButton, pauseButton]);
-          enable([recordButton, playButton, rateControl, volumeControl]);
-          recorder.stop(); // sends the result to the soundFile
+          looper.disable(stopRecordingButton, pauseButton);
+          looper.enable(recordButton, playButton, rateControl, volumeControl);
+          controls.stopRecording();
           statusText.text("Recorded");
         });
 
         playButton.on("click", function() {
-          disable([stopRecordingButton,, playButton]);
-          enable([recordButton, pauseButton, rateControl, volumeControl]);
-          soundFile.loop();
+          looper.disable(stopRecordingButton, playButton);
+          looper.enable(recordButton, pauseButton, rateControl, volumeControl);
+          controls.playLoop();
           statusText.text("Playing");
         });
 
         pauseButton.on("click", function() {
-          disable([stopRecordingButton, pauseButton]);
-          enable([recordButton, playButton, rateControl, volumeControl]);
-          soundFile.pause();
+          looper.disable(stopRecordingButton, pauseButton);
+          looper.enable(recordButton, playButton, rateControl, volumeControl);
+          controls.pause();
           statusText.text("Paused");
         });
 
         rateControl.on("change", function() {
-          soundFile.rate(rateControl.prop("value"));
+          controls.resetRate();
         });
 
         volumeControl.on("change", function() {
-          soundFile.setVolume(+volumeControl.prop("value"));
+          controls.resetVolume();
         });
 
       };
@@ -126,9 +102,10 @@
         tracksList.append(container);
       }
 
-      mic.start();
       addTrackButton.on("click", addTrack);
       addTrack();
+        var controls = looper.getControlHelper();
+
     });
   </script>
 </body>
