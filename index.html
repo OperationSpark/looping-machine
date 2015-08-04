@@ -3,12 +3,27 @@
     body {
       padding: 0;
       margin: 0;
+      background-color: rgb(141,141,141);
     }
     input[type=range] {
       width: 300px;
     }
     label {
       display: block;
+    }
+    #tracks {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    #tracks li {
+      list-style: none;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid black;
+      background-color: rgb(0,191,255);
+      margin: 10px;
     }
   </style>
   <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -31,6 +46,10 @@
       <button class="play" disabled>Play</button>
       <button class="pause" disabled>Pause</button>
       <label>
+        Offset:
+        <input class="offset" type="range" min="0" max="5000" step="100" value="0" disabled>
+      </label>
+      <label>
         Rate:
         <input class="rate" type="range" min="0.1" max="3" step="0.1" value="1" disabled>
       </label>
@@ -46,17 +65,18 @@
       "use strict"
       var addTrackButton = $("[id=add-track]");
 
-      var setupControls = function( controls, htmlContainer ) {
-        var recordButton = $("[class=record]", htmlContainer);
-        var stopRecordingButton = $("[class=stopRecording]", htmlContainer);
-        var playButton = $("[class=play]", htmlContainer);
-        var pauseButton = $("[class=pause]", htmlContainer);
-        var rateControl = $("[class=rate]", htmlContainer);
-        var volumeControl = $("[class=volume]", htmlContainer);
-        var statusText = $("[class=status]", htmlContainer);
+      var setupControls = function( controls, thisControlHtml ) {
+        var recordButton = $("[class=record]", thisControlHtml);
+        var stopRecordingButton = $("[class=stopRecording]", thisControlHtml);
+        var playButton = $("[class=play]", thisControlHtml);
+        var pauseButton = $("[class=pause]", thisControlHtml);
+        var offsetControl = $("[class=offset]", thisControlHtml);
+        var rateControl = $("[class=rate]", thisControlHtml);
+        var volumeControl = $("[class=volume]", thisControlHtml);
+        var statusText = $("[class=status]", thisControlHtml);
 
         recordButton.on("click", function() {
-          looper.disable(recordButton, playButton, pauseButton, rateControl, volumeControl);
+          looper.disable(recordButton, playButton, pauseButton, offsetControl, rateControl, volumeControl);
           looper.enable(stopRecordingButton);
           controls.startRecording();
           statusText.text("Recording");
@@ -64,31 +84,38 @@
 
         stopRecordingButton.on("click", function() {
           looper.disable(stopRecordingButton, pauseButton);
-          looper.enable(recordButton, playButton, rateControl, volumeControl);
+          looper.enable(recordButton, playButton, offsetControl, rateControl, volumeControl);
           controls.stopRecording();
           statusText.text("Recorded");
         });
 
         playButton.on("click", function() {
           looper.disable(stopRecordingButton, playButton);
-          looper.enable(recordButton, pauseButton, rateControl, volumeControl);
+          looper.enable(recordButton, pauseButton, offsetControl, rateControl, volumeControl);
           controls.playLoop();
           statusText.text("Playing");
         });
 
         pauseButton.on("click", function() {
           looper.disable(stopRecordingButton, pauseButton);
-          looper.enable(recordButton, playButton, rateControl, volumeControl);
+          looper.enable(recordButton, playButton, offsetControl, rateControl, volumeControl);
           controls.pause();
           statusText.text("Paused");
         });
 
+        offsetControl.on("change", function() {
+          var value = offsetControl.prop("value");
+          controls.setOffset(value);
+        })
+
         rateControl.on("change", function() {
-          controls.resetRate();
+          var value = rateControl.prop("value");
+          controls.setRate(value);
         });
 
         volumeControl.on("change", function() {
-          controls.resetVolume();
+          var value = volumeControl.prop("value");
+          controls.setVolume(value);
         });
 
       };

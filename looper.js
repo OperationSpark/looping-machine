@@ -11,8 +11,8 @@ $(function() {
         var templateContents = trackTemplate.prop("content");
         var controlsHtml = document.importNode( templateContents, true); //clone contents
 
-        var rateControl = $("[class=rate]", controlsHtml);
-        var volumeControl = $("[class=volume]", controlsHtml);
+        var offset = 0;
+        var isPaused = false;
 
         var soundFile;
         var recorder = new p5.SoundRecorder();
@@ -34,28 +34,39 @@ $(function() {
         var stopRecording = function() {
           recorder.stop(); // sends the result to the soundFile
         };
-        var playLoop = function() {
-          soundFile.loop();
+        var startPlayLoop = function() {
+          isPaused = false;
+          playLoop();
         };
+        var playLoop = function() {
+          if(isPaused) {
+            return;
+          }
+          soundFile.play();
+          window.setTimeout(playLoop, soundFile.duration() * 1000 + offset);
+        }
         var pause = function() {
+          isPaused = true;
           soundFile.pause();
         };
-        var resetRate = function() {
-          var newRate = rateControl.prop("value");
+        var setRate = function(newRate) {
           soundFile.rate(newRate);
         };
-        var resetVolume = function() {
-          var newVolume = +volumeControl.prop("value");
-          soundFile.setVolume(newVolume);
+        var setVolume = function(newVolume) {
+          soundFile.setVolume(window.parseInt(newVolume)); //makes strings such as "123" become numbers 123
         };
+        var setOffset = function(newOffset) {
+          offset = window.parseInt(newOffset);
+        }
 
         var controls = {
           startRecording: startRecording,
           stopRecording: stopRecording,
-          playLoop: playLoop,
+          playLoop: startPlayLoop,
           pause: pause,
-          resetRate: resetRate,
-          resetVolume: resetVolume,
+          setRate: setRate,
+          setVolume: setVolume,
+          setOffset: setOffset,
         };
 
         setupControls( controls, controlsHtml );
@@ -73,16 +84,6 @@ $(function() {
         $(item).prop("disabled", false);
       });
     };
-
-    var getControlHelper = function(element) {
-      var $element = $(element);
-      var controls = $element.data('controls');
-      if(!controls) {
-        controls = createControls();
-        $element.data('controls', controls);
-      }
-      return controls;
-    }
 
     window.looper = {
         // Create a new set of HTML controls
