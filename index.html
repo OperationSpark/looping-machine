@@ -44,19 +44,16 @@
   <script>
     $(function() {
       "use strict"
-      var tracksList = $("[id=tracks]");
       var addTrackButton = $("[id=add-track]");
 
-      var setupControls = function(container) {
-        var recordButton = $("[class=record]", container);
-        var stopRecordingButton = $("[class=stopRecording]", container);
-        var playButton = $("[class=play]", container);
-        var pauseButton = $("[class=pause]", container);
-        var rateControl = $("[class=rate]", container);
-        var volumeControl = $("[class=volume]", container);
-        var statusText = $("[class=status]", container);
-
-        var controls = looper.getControlHelper();
+      var setupControls = function( controls, htmlContainer ) {
+        var recordButton = $("[class=record]", htmlContainer);
+        var stopRecordingButton = $("[class=stopRecording]", htmlContainer);
+        var playButton = $("[class=play]", htmlContainer);
+        var pauseButton = $("[class=pause]", htmlContainer);
+        var rateControl = $("[class=rate]", htmlContainer);
+        var volumeControl = $("[class=volume]", htmlContainer);
+        var statusText = $("[class=status]", htmlContainer);
 
         recordButton.on("click", function() {
           looper.disable(recordButton, playButton, pauseButton, rateControl, volumeControl);
@@ -97,14 +94,11 @@
       };
 
       var addTrack = function() {
-        var container = looper.createNewControlsHtml();
-        setupControls(container);
-        tracksList.append(container);
+        looper.createNewControlsHtml(setupControls);
       }
 
       addTrackButton.on("click", addTrack);
       addTrack();
-        var controls = looper.getControlHelper();
 
     });
   </script>
