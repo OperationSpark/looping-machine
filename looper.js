@@ -19,6 +19,9 @@ $(function() {
     };
 
     var createNewControlsHtml = function(setupControls) {
+        if(!setupControls || !setupControls.call) {
+          throw new Error("createNewControlsHtml must have one parameter and it must be a function");
+        }
         var templateContents = trackTemplate.prop("content");
         var controlsHtml = document.importNode( templateContents, true); //clone contents
 

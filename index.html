@@ -53,20 +53,18 @@
         Rate:
         <input class="rate" type="range" min="0.1" max="3" step="0.1" value="1" disabled>
       </label>
-      <label>
-        Volume:
-        <input class="volume" type="range" min="0.1" max="5" step="0.2" value="1" disabled>
-      </label>
     </li>
   </template>
 
   <script>
     $(function() {
       "use strict"
-      var addTrackButton = $("[id=add-track]");
 
-      var setupControls = function( controls, thisControlHtml ) {
-        // Capture buttons and controls that we will be using
+      // When adding controls for a new track, use this function
+      // to configure how it will work
+      var setupTrackControls = function( audioControls, thisControlHtml ) {
+
+        // Capture buttons and audioControls that we will be using
         var recordButton = $("[class=record]", thisControlHtml);
         var stopRecordingButton = $("[class=stopRecording]", thisControlHtml);
         var playButton = $("[class=play]", thisControlHtml);
@@ -77,56 +75,76 @@
         var statusText = $("[class=status]", thisControlHtml);
 
         recordButton.on("click", function() {
+          // Uses our looper library to disable/enable buttons and controls
+          // that we want disabled or enabled while recording.
           looper.disable(recordButton, playButton, pauseButton, offsetControl, rateControl, volumeControl);
           looper.enable(stopRecordingButton);
-          controls.startRecording();
-          statusText.text("Recording");
+          // TODO 2:
+          // Uncomment the following code to start recording and show a message about it
+          //audioControls.startRecording();
+          //statusText.text("Recording"); // Change the status message to let us know that we're recording
         });
 
         stopRecordingButton.on("click", function() {
-          looper.disable(stopRecordingButton, pauseButton);
-          looper.enable(recordButton, playButton, offsetControl, rateControl, volumeControl);
-          controls.stopRecording();
-          statusText.text("Recorded");
+          //TODO 3:
+          // When clicking on the stopRecordingButton, disable stopRecordingButton and pauseButton
+          // enable recordButton, playButton, offsetControl, rateControl
+          // Call the `audiocontrols.stopRecording()` function to stop recording
+          // Show a status text that says "Recording Finished"
         });
 
         playButton.on("click", function() {
-          looper.disable(stopRecordingButton, playButton);
-          looper.enable(recordButton, pauseButton, offsetControl, rateControl, volumeControl);
-          controls.playLoop();
-          statusText.text("Playing");
+          //TODO 4:
+          // When clicking on the playButton, disable stopRecordingButton and playButton
+          // enable recordButton, pauseButton, offsetControl, rateControl
+          // Play the recorded noise in a loop. Find documentation and an example of
+          // how to do that about 2/3 of the way down the looper.js file
+          // Show a status text that says "Playing"
         });
 
         pauseButton.on("click", function() {
-          looper.disable(stopRecordingButton, pauseButton);
-          looper.enable(recordButton, playButton, offsetControl, rateControl, volumeControl);
-          controls.pause();
-          statusText.text("Paused");
+          // TODO 6:
+          // When clicking on the pauseButton, disable stopRecordingButton and pauseButton
+          // enable recordButton, playButton, offsetControl, rateControl
+          // Find documentation for how to pause the noise using `audioControls` and do that
+          // Show a status text that says "Paused"
         });
 
         offsetControl.on("change", function() {
-          var value = offsetControl.prop("value");
-          controls.setOffset(value);
+          // TODO 7:
+          // Uncomment the code below to allow yourself to change track offset
+          //var value = offsetControl.prop("value"); //Get the current value of the offet slider
+          //audioControls.setOffset(value);
         })
 
         rateControl.on("change", function() {
-          var value = rateControl.prop("value");
-          controls.setRate(value);
+          //TODO 8:
+          // When the rateControl value changes, get the value (same as with the offsetControl)
+          // and call `audioControls.setOffset` with it
         });
 
         volumeControl.on("change", function() {
-          var value = volumeControl.prop("value");
-          controls.setVolume(value);
+          // TODO 9:
+          // When the volumeControl changes get the value and call `audioControls.setVolume`
+          // BUT THIS WON'T WORK.
+          // There is not volume control in the html template above!
+          // Add one similar to the rate control give it a `class="volume"`, a min of 0, a max
+          // of 5, and a step of 0.2. Set the initial value to 1 and make it disabled.
         });
 
       };
 
       var addTrack = function() {
-        looper.createNewControlsHtml(setupControls);
+        // TODO 1:
+        // When adding a track, call `looper.createNewControlsHtml`for a new track, use this function
+        // to configure how it will work
+        // Pass in the `setupTrackControls` above function as an argument
       }
 
-      addTrackButton.on("click", addTrack);
-      addTrack();
+      $("[id=add-track]").on("click", addTrack);
+      // TODO 5:
+      // It sure is annoying to have to click `addTrack` every time. We always want
+      // at least one track. Call the `addTrack` function here at least once.
 
     });
   </script>
